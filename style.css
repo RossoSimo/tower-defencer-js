@@ -1,0 +1,13 @@
+body {
+    background: black;
+}
+
+#game {
+    border-bottom: 1px solid black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('./img/background/back.png');
+    font-family: 'Roboto Mono', monospace;
+}
