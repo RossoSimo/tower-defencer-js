@@ -1,7 +1,10 @@
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+//const ctx = canvas.getContext('2d');
 canvas.width = 1000;
 canvas.height = 700;
+
+var ctx = canvas.getContext('2d', { alpha: false });
+
 /*
 let background = new Image();
 background.src = './img/background/back.png';
