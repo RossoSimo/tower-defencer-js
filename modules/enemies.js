@@ -30,7 +30,7 @@ class Enemy {
         this.height = cellSize - cellGap*2;
         this.upgrade = false;
         if(n === 1) { // verme
-            this.speed = 0.55;
+            this.speed = 0.50;
             this.movement = this.speed;
             this.health = 80;
             this.maxHealth = this.health;
@@ -42,7 +42,7 @@ class Enemy {
             this.spriteWidth = 140;
             this.spriteHeight = 140;
         } else if(n === 2) { // scheletro
-            this.speed = 0.3;
+            this.speed = 0.25;
             this.movement = this.speed;
             this.health = 250;
             this.maxHealth = this.health;
@@ -50,9 +50,9 @@ class Enemy {
             this.frameX = 0;
             this.frameY = 0;
             this.minFrame = 0;
-            this.maxFrame = 8;
-            this.spriteWidth = 22; // cambia
-            this.spriteHeight = 33; // cambia
+            this.maxFrame = 12;
+            this.spriteWidth = 100; // cambia
+            this.spriteHeight = 100; // cambia
         }
     }
     update() {
@@ -64,9 +64,9 @@ class Enemy {
             this.upgrade = true;
         }
         if(score >= 2001 && score <= 4000 && this.upgrade == false) {
-            this.health *= 2;
+            this.health *= 1.95;
             this.maxHealth = this.health;
-            this.speed *= 2;
+            this.speed *= 1.95;
             this.movement = this.speed;
             this.upgrade = true;
         }
@@ -84,7 +84,7 @@ class Enemy {
         ctx.font = '21px Roboto Mono';
         ctx.fillText(Math.floor(this.health), this.x + 45, this.y + 40)
         if(this.n == 1) ctx.drawImage(this.enemyTypes, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x-15, this.y, this.width, this.height);
-        else  ctx.drawImage(this.enemyTypes, this.frameX * this.spriteWidth, 0, this.spriteWidth-2.5, this.spriteHeight, this.x-10, this.y, this.width-30, this.height);
+        else  ctx.drawImage(this.enemyTypes, this.frameX * (this.spriteWidth), 0, this.spriteWidth, this.spriteHeight, this.x-10, this.y, this.width, this.height);
     }
 
 }
@@ -92,7 +92,7 @@ class Enemy {
 import {frame} from './utils.js';
 
 let mob = 1;
-let skeletonTimer = 15;
+let skeletonTimer = 15; // 15
 
 function handleEnemies() {
     for(let i = 0; i < enemies.length; i++) {
@@ -105,8 +105,7 @@ function handleEnemies() {
             let gain = enemies[i].maxHealth/5
             addCoin(gain);
             updateScore(gain);
-            floatingMsg.push(new Msg("+" + gain, 870, 30, 30,'white')); // + su score
-            //floatingMsg.push(new Msg("+" + gain, 870, 70, 30,'white')); // + sui coins 
+            floatingMsg.push(new Msg("+" + gain, 870, 30, 30,'white'));
             const find = enemyPositions.indexOf(enemies[i].y);
             enemyPositions.splice(find, 1);
             enemies.splice(i, 1);
@@ -129,30 +128,78 @@ function handleEnemies() {
 
 }
 
-export {Enemy, handleEnemies, enemies, enemyPositions};
-
-const bosses = [];
-
 const bossImage = new Image();
 bossImage.src = '../img/boss/Walk.png';
 
 class Boss {
     constructor(verticalPos) {
         this.x = canvas.width;
-        this.y = verticalPos;
-        this.width = (cellSize*3) - cellGap*2;
-        this.height = (cellSize*3) - cellGap*2;
-        this.health = 2000;
+        this.y = verticalPos[1];
+        this.verticalLvl = verticalPos;
+        this.width = (cellSize*3) - (cellGap*2);
+        this.height = (cellSize*3) - (cellGap*2);
+        this.health = 14500;
         this.maxHealth = this.health;
-        this.speed = 0.6;
+        this.speed = 0.1;
         this.movement = this.speed;
         // SPRITE
         this.frame = bossImage;
         this.frameX = 0;
         this.frameY = 0;
         this.minFrame = 0;
-        this.maxFrame = 7;
-        this.spriteWidth = 140;
-        this.spriteHeight = 140;
+        this.maxFrame = 5;
+        this.spriteWidth = 160.5;
+        this.spriteHeight = 144;
+    }
+
+    update() {
+        this.x -= this.movement;
+        if(frame % 30 === 0) {
+            if(this.frameX < this.maxFrame) this.frameX++;
+            else this.frameX = this.minFrame;
+        }
+    }
+    draw() {
+        ctx.fillStyle = 'black';
+        ctx.font = '30px Roboto Mono';
+        ctx.fillText(Math.floor(this.health), this.x + 200, this.y + 40)
+        ctx.drawImage(bossImage, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
     }
 }
+
+export let boss = null;
+
+export function handleBoss() {
+    if(boss) {
+        boss.update();
+        boss.draw();
+        if(boss.x < 0) {
+            gameOver();
+        }
+        if(boss.health <= 0) {
+            let gain = 200;
+            addCoin(gain);
+            updateScore(1000);
+            floatingMsg.push(new Msg("+" + gain, 870, 30, 30,'white'));
+            for(let j = 0; j < 3; j++) {
+                let find = enemyPositions.indexOf(boss.verticalLvl[j]);
+                enemyPositions.splice(find, 1);
+            }
+            boss = null;
+        }
+    } else {
+        
+        if(score >= 1500 && score < winningScore && frame % 3000 === 0) {
+            let verticalPos = [];
+            verticalPos.push(Math.floor(Math.random() * 4 + 2) * cellSize + cellGap);
+            verticalPos.push(verticalPos[0]-100);
+            verticalPos.push(verticalPos[0]+100);
+            enemyPositions.push(verticalPos[0]);
+            enemyPositions.push(verticalPos[1]);
+            enemyPositions.push(verticalPos[2]);
+            boss = new Boss(verticalPos);
+       }
+    }
+}
+
+export {Enemy, handleEnemies, enemies, enemyPositions};

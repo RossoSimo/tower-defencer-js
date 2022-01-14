@@ -1,7 +1,7 @@
 import {cellSize, cellGap} from './grid.js';
 import {mouse} from './mouse.js';
 import * as Coin from './coins.js';
-import {enemies, enemyPositions} from './enemies.js';
+import { boss, enemies, enemyPositions } from './enemies.js';
 import {collision, floatingMsg, Msg, frame} from './utils.js';
 import { choseDef } from './controlsBar.js';
 
@@ -30,19 +30,11 @@ class Projectile {
         this.spriteHeight = 5;
     }
     update() {
-        if(this.frameX < this.maxFrame) this.frameX++;
-        else this.frameX = this.minFrame;
         this.x += this.speed;
     }
 
-
-    // NEED FIX 
     draw() {
-        //ctx.fillStyle = 'black';
-        //ctx.beginPath();
-        //ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
-        //ctx.fill();
-        ctx.drawImage(arrow, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+        ctx.drawImage(arrow, this.frameX, 0, this.spriteWidth, this.spriteHeight, this.x, this.y-5, this.width*2, this.height*2);
     }
 }
 
@@ -57,6 +49,12 @@ function handleProjectile() {
                 projectiles.splice(i, 1);
                 i--;
             }
+        }
+
+        if(boss && projectiles[i] && collision(boss, projectiles[i])) {
+            boss.health -= projectiles[i].power;
+            projectiles.splice(i, 1);
+            i--;
         }
 
         if (projectiles[i] && projectiles[i].x > canvas.width) {
@@ -107,9 +105,9 @@ class Defender {
         } else if(choseDef == 2) { 
             this.health = 40;
             this.maxFrame = 1;
-            this.firerate = 10;
-            this.spriteWidth = 62;
-            this.spriteHeight = 62;
+            this.firerate = 13;
+            this.spriteWidth = 100;
+            this.spriteHeight = 100;
         }
         this.minFrame = 0;
         
@@ -123,10 +121,10 @@ class Defender {
         ctx.fillText(Math.floor(this.health), this.x, this.y + 30)
         if(this.idle === true) {
             if(this.n === 0) ctx.drawImage(defendersTypeIdle[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x-25, this.y-20, this.width+70, this.height+70);
-            else ctx.drawImage(defendersTypeIdle[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x-25, this.y-20, this.width, this.height);
+            else ctx.drawImage(defendersTypeIdle[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x+5, this.y, this.width+10, this.height+10);
         } else {
             if(this.n === 0) ctx.drawImage(defendersTypeAttack[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x-25, this.y-20, this.width+70, this.height+70);
-            else ctx.drawImage(defendersTypeAttack[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x-25, this.y-20, this.width, this.height);
+            else ctx.drawImage(defendersTypeAttack[this.n], this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x+5, this.y, this.width+10, this.height+10);
         }
         
     }
@@ -156,7 +154,7 @@ canvas.addEventListener('click', function() {
     }
     let defenderCost = 100;
     if(choseDef == 2) {
-        defenderCost = 190;
+        defenderCost = 200;
     }
     if(Coin.coin >= defenderCost) {
         defenders.push(new Defender(gridPositionX, gridPositionY));
@@ -179,7 +177,7 @@ function handleDefender() {
         } else {
             defenders[i].idle = true;
             if(defenders[i].n === 1) {
-                defenders[i].maxFrame = 1;
+                defenders[i].maxFrame = 7;
             }
         }
         for ( let j = 0 ; j < enemies.length; j++) {
@@ -193,7 +191,15 @@ function handleDefender() {
                 enemies[j].movement = enemies[j].speed;
             }
         }
-        
+        if(boss && defenders[i] && collision(boss, defenders[i])) {
+            defenders[i].health -= 2;
+            boss.movement = boss.speed/3;
+        }
+        if(defenders[i] && defenders[i].health <= 0) {
+            defenders.splice(i, 1);
+            i--;
+            boss.movement = boss.speed;
+        }
     }
 }
 

@@ -41,8 +41,8 @@ export let game_over = false;
 export function handleGameStatus() {
     ctx.fillStyle = 'white';
     ctx.font = '30px Roboto Mono';
-    ctx.fillText('Score: ' + score, 760, 80);
-    ctx.fillText('Coin: ' + coin, 760, 40);
+    ctx.fillText('Score: ' + parseInt(score), 760, 80);
+    ctx.fillText('Coin: ' + parseInt(coin), 760, 40);
     if(game_over) {
         ctx.fillStyle = 'black';
         ctx.font = '60px Roboto Mono';

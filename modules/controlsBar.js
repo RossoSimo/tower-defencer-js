@@ -53,7 +53,8 @@ function handleBar() {
     ctx.fillRect(cardB.x, cardB.y, cardB.width, cardB.height);
     ctx.strokeStyle = cardBstroke;
     ctx.strokeRect(cardB.x, cardB.y, cardB.width, cardB.height);
-    ctx.fillText("190", 160, 60);
+    ctx.fillText("200", 160, 60);
+    ctx.drawImage(defendersTypeIdle[1], 0, 0, 100, 100, 190, -8, 115, 115);
 
 }
 

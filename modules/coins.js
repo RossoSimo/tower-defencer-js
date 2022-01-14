@@ -18,6 +18,9 @@ import { Msg, floatingMsg} from './utils.js'
 
 const drops = [];
 
+let coinImage = new Image();
+coinImage.src = '../img/coin/coin.png';
+
 class Drop {
     constructor() {
         this.x = Math.random() * (canvas.width - cellSize);
@@ -25,13 +28,23 @@ class Drop {
         this.width = cellSize * 0.6;
         this.height = cellSize * 0.6;
         this.value = 20;
+
+        this.frame = coinImage;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.minFrame = 0;
+        this.maxFrame = 13;
+        this.spriteWidth = 60;
+        this.spriteHeight = 60;
+    }
+    update() {
+        if(frame % 10 === 0) {
+            if(this.frameX < this.maxFrame) this.frameX++;
+            else this.frameX = this.minFrame;
+        }
     }
     draw() {
-        ctx.fillStyle = 'yellow';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.fillStyle = 'black';
-        ctx.font = '20px Roboto Mono';
-        ctx.fillText(this.value, this.x + 15, this.y + 15);
+        ctx.drawImage(this.frame, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -40,6 +53,7 @@ function handleDrops() {
         drops.push(new Drop());
     }
     for ( let i = 0; i < drops.length; i++) {
+        drops[i].update();
         drops[i].draw();
         if ( drops[i] && mouse.x && mouse.y && collision(drops[i], mouse)) {
             addCoin(drops[i].value);

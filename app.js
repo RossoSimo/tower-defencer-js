@@ -2,7 +2,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 canvas.width = 1000;
 canvas.height = 700;
-
+/*
 let background = new Image();
 background.src = './img/background/back.png';
 
@@ -10,12 +10,12 @@ background.onload = function() {
     console.log('background loaded');
     ctx.drawImage(background, 50,100);
 }
-
+*/
 // improts
 import * as Grid from './modules/grid.js';
 import { handleDefender, handleProjectile} from './modules/defenders.js';
 import { handleGameStatus, updateFrame, game_over, handleMsg} from './modules/utils.js';
-import { handleEnemies } from './modules/enemies.js';
+import { handleBoss, handleEnemies } from './modules/enemies.js';
 import { handleDrops } from './modules/coins.js';
 import { handleBar } from './modules/controlsBar.js';
 
@@ -45,6 +45,7 @@ function animate() {
     handleDefender();
     handleProjectile();
     handleEnemies();
+    handleBoss();
 
     handleDrops();
 
@@ -56,6 +57,15 @@ function animate() {
 
     updateFrame();
 
-    if(!game_over) requestAnimationFrame(animate);
+    if( !game_over ) requestAnimationFrame(animate);
+    //if(pause) {
+    //    handlePause();
+    //} 
 }
 animate();
+
+//let pause = false;
+
+//function handlePause() {
+
+//}
